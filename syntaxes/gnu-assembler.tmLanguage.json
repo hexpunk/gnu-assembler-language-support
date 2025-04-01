@@ -1,0 +1,261 @@
+{
+  "name": "GNU Assembler",
+  "scopeName": "source.assembly.gnu",
+  "fileTypes": ["s", "S"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#instructions" },
+    { "include": "#labels" },
+    { "include": "#label-references" },
+    { "include": "#dot-directives" },
+    { "include": "#registers" },
+    { "include": "#preprocessor" },
+    { "include": "#constants" },
+    { "include": "#immediates" },
+    { "include": "#strings" },
+    { "include": "#characters" },
+    { "include": "#invalid" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.assembly.gnu",
+          "begin": "/\\*",
+          "end": "\\*/",
+          "foldingStartMarker": "^\\s*/\\*",
+          "foldingStopMarker": "\\*/"
+        },
+        {
+          "name": "comment.line.number-sign.assembly.gnu",
+          "match": "#.*$"
+        }
+      ]
+    },
+    "instructions": {
+      "patterns": [
+        {
+          "name": "keyword.instruction.assembly.gnu",
+          "match": "\\b[a-zA-Z]+\\b"
+        }
+      ]
+    },
+    "labels": {
+      "patterns": [
+        {
+          "name": "meta.directive.label.assembly.gnu",
+          "match": "^[ \t]*([._a-zA-Z][\\w]*)(:)",
+          "captures": {
+            "1": { "name": "entity.name.label.assembly.gnu" },
+            "2": { "name": "punctuation.separator.label.assembly.gnu" }
+          }
+        }
+      ]
+    },
+    "label-references": {
+      "patterns": [
+        {
+          "name": "meta.label-reference.assembly.gnu",
+          "match": "(?<!%)\\b([._a-zA-Z][\\w]*)\\b(?!\\s*[:])",
+          "captures": {
+            "1": { "name": "variable.label.reference.assembly.gnu" }
+          }
+        }
+      ]
+    },
+    "dot-directives": {
+      "patterns": [
+        {
+          "name": "constant.language.location-counter.assembly.gnu",
+          "match": "^\\s*\\.(?=\\s|$)"
+        },
+        {
+          "name": "meta.directive.section.assembly.gnu",
+          "begin": "^\\s*\\.(section|text|data|bss)\\b",
+          "beginCaptures": {
+            "1": { "name": "keyword.directive.section.assembly.gnu" }
+          },
+          "end": "(?=#|/\\*|$)",
+          "patterns": [
+            {
+              "match": "\\.[_a-zA-Z][\\w]*",
+              "name": "meta.directive.argument.section-name.assembly.gnu"
+            },
+            {
+              "match": "[a-zA-Z]",
+              "name": "constant.character.section-flag.assembly.gnu"
+            },
+            { "match": ",", "name": "punctuation.separator.assembly.gnu" },
+            { "include": "#strings" },
+            { "include": "#comments" }
+          ]
+        },
+        {
+          "name": "meta.directive.symbol.assembly.gnu",
+          "begin": "^\\s*\\.(globl|global|type|size|comm|lcomm|weak|hidden)\\b",
+          "beginCaptures": {
+            "1": { "name": "keyword.directive.symbol.assembly.gnu" }
+          },
+          "end": "(?=#|/\\*|$)",
+          "patterns": [
+            {
+              "match": "[._a-zA-Z][\\w]*",
+              "name": "entity.name.symbol.assembly.gnu"
+            },
+            {
+              "match": "@[a-zA-Z_]+",
+              "name": "keyword.symbol.type.assembly.gnu"
+            },
+            { "match": ",", "name": "punctuation.separator.assembly.gnu" },
+            { "include": "#constants" },
+            { "include": "#comments" }
+          ]
+        },
+        {
+          "name": "meta.directive.data.assembly.gnu",
+          "begin": "^\\s*\\.(ascii|asciz|string|byte|word|long|quad|fill|zero|space|org|align|balign|p2align)\\b",
+          "beginCaptures": {
+            "1": { "name": "keyword.directive.data.assembly.gnu" }
+          },
+          "end": "(?=#|/\\*|$)",
+          "patterns": [
+            { "match": ",", "name": "punctuation.separator.assembly.gnu" },
+            { "include": "#strings" },
+            { "include": "#characters" },
+            { "include": "#constants" },
+            { "include": "#comments" }
+          ]
+        },
+        {
+          "name": "meta.directive.generic.assembly.gnu",
+          "match": "\\b\\.[a-zA-Z_][\\w]*\\b",
+          "captures": {
+            "0": { "name": "support.directive.assembly.gnu" }
+          }
+        },
+        {
+          "begin": "^\\s*\\.macro\\b",
+          "end": "^\\s*\\.endm\\b",
+          "name": "meta.macro.assembly.gnu",
+          "beginCaptures": {
+            "0": { "name": "keyword.directive.macro.begin.assembly.gnu" }
+          },
+          "endCaptures": {
+            "0": { "name": "keyword.directive.macro.end.assembly.gnu" }
+          },
+          "patterns": [{ "include": "$self" }],
+          "foldingStartMarker": "^\\s*\\.macro\\b",
+          "foldingStopMarker": "^\\s*\\.endm\\b"
+        }
+      ]
+    },
+    "registers": {
+      "patterns": [
+        {
+          "name": "variable.register.assembly.gnu",
+          "match": "%[a-zA-Z][a-zA-Z0-9]*"
+        }
+      ]
+    },
+    "preprocessor": {
+      "patterns": [
+        {
+          "name": "meta.preprocessor.assembly.gnu",
+          "match": "^\\s*#(define|include|ifdef|ifndef|endif|undef|elif)\\b.*$"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.numeric.hex.assembly.gnu",
+          "match": "\\b-?0x[0-9a-fA-F]+\\b"
+        },
+        {
+          "name": "constant.numeric.binary.assembly.gnu",
+          "match": "\\b-?0b[01]+\\b"
+        },
+        {
+          "name": "constant.numeric.decimal.assembly.gnu",
+          "match": "\\b-?\\d+\\b"
+        }
+      ]
+    },
+    "immediates": {
+      "patterns": [
+        {
+          "begin": "\\$",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.immediate.assembly.gnu" }
+          },
+          "end": "(?=,|\\)|$)",
+          "name": "meta.immediate.assembly.gnu",
+          "patterns": [
+            {
+              "begin": "\\(",
+              "beginCaptures": {
+                "0": { "name": "punctuation.section.group.begin.assembly.gnu" }
+              },
+              "end": "\\)",
+              "endCaptures": {
+                "0": { "name": "punctuation.section.group.end.assembly.gnu" }
+              },
+              "patterns": [
+                { "include": "#label-references" },
+                { "include": "#constants" },
+                { "include": "#arithmetic" },
+                { "include": "#immediates" }
+              ]
+            },
+            { "include": "#constants" },
+            { "include": "#label-references" },
+            { "include": "#arithmetic" }
+          ]
+        }
+      ]
+    },
+    "arithmetic": {
+      "patterns": [
+        {
+          "match": "\\|+|&|\\^|\\+|\\-|\\*|/|%|<<|>>",
+          "name": "keyword.operator.arithmetic.assembly.gnu"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.assembly.gnu",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.assembly.gnu",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "characters": {
+      "patterns": [
+        {
+          "name": "constant.character.assembly.gnu",
+          "match": "'(\\\\.|[^'])'",
+          "captures": {
+            "0": { "name": "constant.character.assembly.gnu" },
+            "1": { "name": "constant.character.value.assembly.gnu" }
+          }
+        }
+      ]
+    },
+    "invalid": {
+      "patterns": [
+        {
+          "name": "invalid.illegal.assembly.gnu",
+          "match": "[^\u0020-\u007E\t\r\n]+"
+        }
+      ]
+    }
+  }
+}

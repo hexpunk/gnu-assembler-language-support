@@ -7,15 +7,30 @@
     "vscode": "^1.98.0"
   },
   "categories": [
-    "Other"
+    "Programming Languages"
   ],
   "activationEvents": [],
   "browser": "./dist/web/extension.js",
   "contributes": {
-    "commands": [
+    "languages": [
       {
-        "command": "gnu-assembler-language-support.helloWorld",
-        "title": "Hello World"
+        "id": "gnu-assembler",
+        "extensions": [
+          ".s",
+          ".S"
+        ],
+        "aliases": [
+          "GAS",
+          "GNU Assembler"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "gnu-assembler",
+        "scopeName": "source.assembly.gnu",
+        "path": "./syntaxes/gnu-assembler.tmLanguage.json"
       }
     ]
   },
