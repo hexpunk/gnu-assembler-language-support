@@ -8,6 +8,8 @@
     { "open": "(", "close": ")" },
     { "open": "\"", "close": "\"" },
     { "open": "'", "close": "'" },
+    { "open": "/**", "close": " */", "notIn": ["string"] },
+    { "open": "/* ", "close": " */" },
     { "open": "/*", "close": "*/" }
   ],
   "surroundingPairs": [
@@ -21,5 +23,29 @@
       "start": "^\\s*/\\*\\s*#?region\\b",
       "end": "^\\s*\\*/\\s*#?endregion\\b"
     }
-  }
+  },
+  "onEnterRules": [
+    {
+      "beforeText": "^\\s*/\\*\\*\\s*$",
+      "action": {
+        "indent": "indentOutdent",
+        "appendText": " * "
+      }
+    },
+    {
+      "beforeText": "^\\s*\\*(?!/).*",
+      "action": {
+        "indent": "none",
+        "appendText": "* "
+      }
+    },
+    {
+      "beforeText": "^\\s*\\*\\s*$",
+      "afterText": "^\\s*\\*/$",
+      "action": {
+        "indent": "none",
+        "appendText": "* "
+      }
+    }
+  ]
 }
