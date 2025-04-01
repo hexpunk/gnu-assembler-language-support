@@ -44,9 +44,17 @@
       "patterns": [
         {
           "name": "meta.directive.label.assembly.gnu",
-          "match": "^[ \t]*([._a-zA-Z][\\w]*)(:)",
+          "match": "^[ \\t]*([._a-zA-Z][\\w]*)(:)",
           "captures": {
             "1": { "name": "entity.name.label.assembly.gnu" },
+            "2": { "name": "punctuation.separator.label.assembly.gnu" }
+          }
+        },
+        {
+          "name": "meta.directive.numeric-label.assembly.gnu",
+          "match": "^[ \\t]*(\\d+)(:)",
+          "captures": {
+            "1": { "name": "entity.name.label.numeric.assembly.gnu" },
             "2": { "name": "punctuation.separator.label.assembly.gnu" }
           }
         }
@@ -54,6 +62,14 @@
     },
     "label-references": {
       "patterns": [
+        {
+          "name": "meta.numeric-label-reference.assembly.gnu",
+          "match": "\\b(\\d+)([fb])\\b",
+          "captures": {
+            "1": { "name": "variable.label.reference.numeric.assembly.gnu" },
+            "2": { "name": "keyword.label.direction.assembly.gnu" }
+          }
+        },
         {
           "name": "meta.label-reference.assembly.gnu",
           "match": "(?<!%)\\b([._a-zA-Z][\\w]*)\\b(?!\\s*[:])",
