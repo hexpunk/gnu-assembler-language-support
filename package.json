@@ -9,7 +9,10 @@
   "categories": [
     "Programming Languages"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished",
+    "onFileSystem:file"
+  ],
   "browser": "./dist/web/extension.js",
   "contributes": {
     "languages": [
