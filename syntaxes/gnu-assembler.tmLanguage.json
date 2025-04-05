@@ -35,8 +35,22 @@
     "instructions": {
       "patterns": [
         {
-          "name": "keyword.instruction.assembly.gnu",
-          "match": "\\b[a-zA-Z]+\\b"
+          "name": "meta.instruction.assembly.gnu",
+          "begin": "^\\s*([a-zA-Z]+)\\b",
+          "beginCaptures": {
+            "1": { "name": "keyword.instruction.assembly.gnu" }
+          },
+          "end": "(?=#|/\\*|$)",
+          "patterns": [
+            {
+              "match": ",",
+              "name": "punctuation.separator.operand.assembly.gnu"
+            },
+            { "include": "#registers" },
+            { "include": "#immediates" },
+            { "include": "#label-references" },
+            { "include": "#constants" }
+          ]
         }
       ]
     },
