@@ -2,7 +2,7 @@
 import "mocha/mocha";
 
 mocha.setup({
-  ui: "tdd",
+  ui: "bdd",
   reporter: undefined,
 });
 
