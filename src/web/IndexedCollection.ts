@@ -177,13 +177,17 @@ export default class IndexedCollection<
   }
 
   /**
-   * Clears all items and indexes from the collection.
-   * This method removes all elements from both the `items` and `indexes` maps,
-   * effectively resetting the collection to an empty state.
+   * Clears all items and indexes in the collection.
+   *
+   * This method removes all elements from the `items` collection
+   * and iterates through all index maps, clearing their contents as well.
    */
   clear() {
     this.items.clear();
-    this.indexes.clear();
+
+    for (const indexMap of this.indexes.values()) {
+      indexMap.clear();
+    }
   }
 
   /**
