@@ -1,11 +1,15 @@
 import { strict as assert } from "assert";
-import IndexedCollection from "../../IndexedCollection";
+import { defineIndexedCollection } from "../../IndexedCollection";
 
-describe("IndexedCollection", () => {
-  let store: IndexedCollection<{ id: number; name: string }>;
+describe("MultiAttributeStore", () => {
+  const store = defineIndexedCollection<{
+    id: number;
+    name: string;
+    age?: number;
+  }>()(["id", "name"] as const);
 
   beforeEach(() => {
-    store = new IndexedCollection(["id", "name"]);
+    store.clear();
   });
 
   describe("#constructor", () => {
