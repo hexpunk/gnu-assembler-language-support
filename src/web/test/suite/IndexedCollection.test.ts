@@ -4,9 +4,9 @@ import { defineIndexedCollection } from "../../IndexedCollection";
 describe("MultiAttributeStore", () => {
   const store = defineIndexedCollection<{
     id: number;
-    name: string;
+    name?: string | null;
     age?: number;
-  }>()(["id", "name"] as const);
+  }>()(["id", "name"]);
 
   beforeEach(() => {
     store.clear();
@@ -25,6 +25,27 @@ describe("MultiAttributeStore", () => {
       store.add(item);
       assert.deepEqual(store.getBy("id", 1), [item]);
       assert.deepEqual(store.getBy("name", "Alice"), [item]);
+    });
+
+    it("should not add duplicate items", () => {
+      const item = { id: 1, name: "Alice" };
+      store.add(item);
+      store.add(item);
+      assert.equal(store.size(), 1);
+    });
+
+    it("should handle undefined values gracefully", () => {
+      const item = { id: 1, name: undefined };
+      store.add(item);
+      assert.deepEqual(store.getBy("id", 1), [item]);
+      assert.deepEqual(store.getBy("name", undefined), [item]);
+    });
+
+    it("should handle null values gracefully", () => {
+      const item = { id: 1, name: null };
+      store.add(item);
+      assert.deepEqual(store.getBy("id", 1), [item]);
+      assert.deepEqual(store.getBy("name", null), [item]);
     });
   });
 
@@ -47,6 +68,13 @@ describe("MultiAttributeStore", () => {
       store.removeBy("name", "Alice");
       assert.deepEqual(store.getBy("name", "Alice"), []);
     });
+
+    it("should do nothing if the key-value pair does not exist", () => {
+      const item = { id: 1, name: "Alice" };
+      store.add(item);
+      store.removeBy("name", "Bob");
+      assert.equal(store.size(), 1);
+    });
   });
 
   describe("#getBy", () => {
@@ -54,6 +82,10 @@ describe("MultiAttributeStore", () => {
       const item = { id: 1, name: "Alice" };
       store.add(item);
       assert.deepEqual(store.getBy("id", 1), [item]);
+    });
+
+    it("should return an empty array on an empty collection", () => {
+      assert.deepEqual(store.getBy("id", 1), []);
     });
   });
 
@@ -67,7 +99,7 @@ describe("MultiAttributeStore", () => {
       assert.deepEqual(store.getIndexKeys("name"), ["Alice", "Bob"]);
     });
 
-    it("should return an empty array if no items are indexed for the given key", () => {
+    it("should return an empty array on an empty collection", () => {
       assert.deepEqual(store.getIndexKeys("id"), []);
     });
   });
@@ -87,6 +119,13 @@ describe("MultiAttributeStore", () => {
       store.add(item1);
       const result = store.filter((item) => item.name === "Bob");
       assert.deepEqual(result, []);
+    });
+
+    it("should return an empty array on an empty collection", () => {
+      assert.deepEqual(
+        store.filter(() => true),
+        [],
+      );
     });
   });
 
