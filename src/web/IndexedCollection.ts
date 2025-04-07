@@ -4,7 +4,7 @@
  * This utility function allows you to specify a list of keys that will be used to index
  * the collection, ensuring type safety and flexibility when working with indexed data.
  *
- * @typeParam T - The type of the objects in the collection. Must extend `Record<string, unknown>`.
+ * @template T - The type of the objects in the collection. Must extend `Record<string, unknown>`.
  * @returns A function that accepts an array of keys and returns an `IndexedCollection` instance.
  *
  * @example
@@ -31,7 +31,7 @@ export function defineIndexedCollection<T extends Record<string, unknown>>() {
  * indexing and retrieval based on specified keys. The collection supports adding,
  * removing, and querying items while keeping the indexes up-to-date.
  *
- * @template T - The type of items stored in the collection. Must extend `Record<string, unknown>`.
+ * @template T - The type of the objects in the collection. Must extend `Record<string, unknown>`.
  * @template K - The keys of type `T` that are used for indexing.
  */
 export class IndexedCollection<
@@ -119,7 +119,7 @@ export class IndexedCollection<
   /**
    * Retrieves an array of items from the collection that match the specified key-value pair.
    *
-   * @template Key - A key that extends the type of keys in the collection.
+   * @template Key - A subtype of the key type `K` used to index the collection.
    * @param key - The key to search for in the indexed collection.
    * @param value - The value associated with the specified key to match items against.
    * @returns An array of items that match the specified key-value pair. If no match is found, an empty array is returned.
@@ -138,7 +138,7 @@ export class IndexedCollection<
   /**
    * Retrieves all the keys from the index map associated with the specified index key.
    *
-   * @template Key - A subtype of the generic key type `K`.
+   * @template Key - A subtype of the key type `K` used to index the collection.
    * @param key - The key for which to retrieve the index keys.
    * @returns An array of keys from the index map corresponding to the specified key.
    *          If no index map exists for the given key, an empty array is returned.
