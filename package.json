@@ -6,6 +6,9 @@
   "engines": {
     "vscode": "^1.98.0"
   },
+  "extensionKind": [
+    "workspace"
+  ],
   "categories": [
     "Programming Languages"
   ],
