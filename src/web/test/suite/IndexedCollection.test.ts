@@ -1,12 +1,35 @@
 import { strict as assert } from "assert";
 import { defineIndexedCollection } from "../../IndexedCollection";
 
+type User = {
+  id: number;
+  name?: string | null;
+  email?: string;
+};
+
+// Type-level tests
+const userCollection = defineIndexedCollection<User>()(["id", "email"]);
+
+// Valid usage
+userCollection.add({ id: 1, name: "Alice", email: "alice@example.com" });
+userCollection.add({ id: 2, name: "Bob" }); // email is optional
+
+// Invalid usage (should cause TypeScript errors)
+// @ts-expect-error: Missing required 'id' property
+userCollection.add({ name: "Charlie" });
+
+// @ts-expect-error: 'age' is not a valid key
+userCollection.getBy("age", 30);
+
+// @ts-expect-error: string is not a valid type for key 'id'
+userCollection.getBy("id", "hello");
+
+// @ts-expect-error: 'phone' is not a valid key for indexing
+defineIndexedCollection<User>()(["id", "phone"]);
+
+// Unit tests
 describe("MultiAttributeStore", () => {
-  const store = defineIndexedCollection<{
-    id: number;
-    name?: string | null;
-    age?: number;
-  }>()(["id", "name"]);
+  const store = defineIndexedCollection<User>()(["id", "name"]);
 
   beforeEach(() => {
     store.clear();
