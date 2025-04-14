@@ -1,14 +1,14 @@
 import { strict as assert } from "assert";
-import { transition, FiniteStateMachine } from "../../FiniteStateMachine";
+import { transition } from "../../FiniteStateMachine";
 
 describe("transition", () => {
-  const fsm: FiniteStateMachine<string, string> = {
+  const fsm = {
     initialState: "start",
     transitions: [
       { from: "start", to: "middle", event: "go" },
       { from: "middle", to: "end", event: "finish" },
     ],
-  };
+  } as const;
 
   it("should transition to the correct state on a valid event", () => {
     const result = transition(fsm, fsm.initialState, "go");
