@@ -15,6 +15,12 @@ type AllStates<FSM> =
 type AllEvents<FSM> =
   FSM extends FiniteStateMachine<unknown, infer Event> ? Event : never;
 
+type IsLiteral<T> = string extends T ? false : number extends T ? false : true;
+
+type IsValidState<FSM, State> = State extends AllStates<FSM> ? true : false;
+
+type IsValidEvent<FSM, Event> = Event extends AllEvents<FSM> ? true : false;
+
 type AnyReachableState<FSM extends FiniteStateMachine<unknown, unknown>> =
   FSM["transitions"][number]["to"];
 
@@ -30,15 +36,26 @@ type TransitionMatch<
 > = Extract<FSM["transitions"][number], { from: State; event: Event }>;
 
 type NextState<FSM extends FiniteStateMachine<unknown, unknown>, State, Event> =
-  State extends AllStates<FSM>
-    ? Event extends AllEvents<FSM>
-      ? TransitionMatch<FSM, State, Event>["to"] extends never
-        ? ReachableStatesFrom<FSM, Extract<State, AllStates<FSM>>> extends never
-          ? AnyReachableState<FSM> | undefined // both state/event are too vague
-          : ReachableStatesFrom<FSM, Extract<State, AllStates<FSM>>> | undefined
-        : TransitionMatch<FSM, State, Event>["to"]
-      : AnyReachableState<FSM> | undefined
-    : AnyReachableState<FSM> | undefined;
+  // Check if the provided State is a literal (e.g., "start", not string)
+  IsLiteral<State> extends true
+    ? // If it's a literal, but not a valid FSM state, return undefined
+      IsValidState<FSM, State> extends false
+      ? undefined
+      : // If State is valid, check if Event is also a literal
+        IsLiteral<Event> extends true
+        ? // If Event is a literal but invalid, return undefined
+          IsValidEvent<FSM, Event> extends false
+          ? undefined
+          : // Both State and Event are valid literals — look up the actual transition target
+            TransitionMatch<
+              FSM,
+              Extract<State, AllStates<FSM>>,
+              Extract<Event, AllEvents<FSM>>
+            >["to"]
+        : // Event is general (e.g., just `string`) — fallback to any reachable state from this valid state
+          ReachableStatesFrom<FSM, Extract<State, AllStates<FSM>>> | undefined
+    : // State is general (e.g., `string`) — fallback to any reachable state at all
+      AnyReachableState<FSM> | undefined;
 
 export function transition<
   const FSM extends FiniteStateMachine<unknown, unknown>,
