@@ -1,4 +1,4 @@
-interface StateTransition<State extends string, Event extends string> {
+interface Transition<State extends string, Event extends string> {
   readonly from: State;
   readonly to: State;
   readonly event: Event;
@@ -9,43 +9,42 @@ export interface FiniteStateMachine<
   Event extends string,
 > {
   readonly initialState: State;
-  readonly transitions: ReadonlyArray<StateTransition<State, Event>>;
+  readonly transitions: ReadonlyArray<Transition<State, Event>>;
 }
 
-type AllStates<FSM> =
-  FSM extends FiniteStateMachine<infer State, string> ? State : never;
+type State<FSM> = FSM extends FiniteStateMachine<infer S, string> ? S : never;
 
-type AllEvents<FSM> =
-  FSM extends FiniteStateMachine<string, infer Event> ? Event : never;
+type Event<FSM> = FSM extends FiniteStateMachine<string, infer E> ? E : never;
 
-type IsLiteral<T> = string extends T ? false : true;
-
-type AnyReachableState<FSM extends FiniteStateMachine<string, string>> =
+type ReachableState<FSM extends FiniteStateMachine<string, string>> =
   FSM["transitions"][number]["to"];
 
-type ReachableStatesFrom<
+type ReachableStateFrom<
   FSM extends FiniteStateMachine<string, string>,
-  State extends AllStates<FSM>,
-> = Extract<FSM["transitions"][number], { from: State }>["to"];
+  S extends State<FSM>,
+> = Extract<FSM["transitions"][number], { from: S }>["to"];
 
 type MatchingTransition<
   FSM extends FiniteStateMachine<string, string>,
-  State extends AllStates<FSM>,
-  Event extends AllEvents<FSM>,
-> = Extract<FSM["transitions"][number], { from: State; event: Event }>;
+  S extends State<FSM>,
+  E extends Event<FSM>,
+> = Extract<FSM["transitions"][number], { from: S; event: E }>;
 
-type NextState<FSM extends FiniteStateMachine<string, string>, State, Event> =
-  State extends AllStates<FSM>
-    ? Event extends AllEvents<FSM>
-      ? MatchingTransition<FSM, State, Event> extends never
+// Check if a type is a literal string type
+type IsStringLiteral<T> = string extends T ? false : true;
+
+type NextState<FSM extends FiniteStateMachine<string, string>, S, E> =
+  S extends State<FSM> // if S is a state in FSM
+    ? E extends Event<FSM> // if E is an event in FSM
+      ? MatchingTransition<FSM, S, E> extends never // if no matching transition
         ? undefined
-        : MatchingTransition<FSM, State, Event>["to"]
-      : IsLiteral<Event> extends true
+        : MatchingTransition<FSM, S, E>["to"]
+      : IsStringLiteral<E> extends true // if E is a string literal
         ? undefined
-        : ReachableStatesFrom<FSM, State> | undefined
-    : IsLiteral<State> extends true
+        : ReachableStateFrom<FSM, S> | undefined
+    : IsStringLiteral<S> extends true // if S is a string literal
       ? undefined
-      : AnyReachableState<FSM> | undefined;
+      : ReachableState<FSM> | undefined;
 /**
  * Executes a state transition in a finite state machine (FSM) based on the current state and an event.
  *
