@@ -57,6 +57,18 @@ type NextState<FSM extends FiniteStateMachine<unknown, unknown>, State, Event> =
     : // State is general (e.g., `string`) — fallback to any reachable state at all
       AnyReachableState<FSM> | undefined;
 
+/**
+ * Executes a state transition in a finite state machine (FSM) based on the current state and an event.
+ *
+ * @template FSM - The type of the finite state machine, which includes its states, events, and transitions.
+ * @template State - The type of the current state in the FSM.
+ * @template Event - The type of the event triggering the transition.
+ *
+ * @param fsm - The finite state machine containing the states, events, and transitions.
+ * @param state - The current state of the FSM.
+ * @param event - The event that triggers the transition.
+ * @returns The next state of the FSM after the transition, or `undefined` if no valid transition is found.
+ */
 export function transition<
   const FSM extends FiniteStateMachine<unknown, unknown>,
   const State,
