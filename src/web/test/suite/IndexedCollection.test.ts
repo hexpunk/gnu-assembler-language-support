@@ -10,6 +10,9 @@ type User = {
 // Type-level tests
 const userCollection = defineIndexedCollection<User>()(["id", "email"]);
 
+// @ts-expect-error: 'doesNotExist' is not a valid key for indexing
+defineIndexedCollection<User>()(["id", "doesNotExist"]);
+
 // Valid usage
 userCollection.add({ id: 1, name: "Alice", email: "alice@example.com" });
 userCollection.add({ id: 2, name: "Bob" }); // email is optional
@@ -20,6 +23,9 @@ userCollection.add({ name: "Charlie" });
 
 // @ts-expect-error: 'age' is not a valid key
 userCollection.getBy("age", 30);
+
+// @ts-expect-error: 'name' is not a valid key for indexing
+userCollection.getBy("name", "test");
 
 // @ts-expect-error: string is not a valid type for key 'id'
 userCollection.getBy("id", "hello");
