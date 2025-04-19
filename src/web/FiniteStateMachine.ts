@@ -1,4 +1,4 @@
-interface Transition<State extends string, Event extends string> {
+export interface Transition<State extends string, Event extends string> {
   readonly from: State;
   readonly to: State;
   readonly event: Event;
@@ -33,7 +33,7 @@ type MatchingTransition<
 // Check if a type is a literal string type
 type IsStringLiteral<T> = string extends T ? false : true;
 
-type NextState<FSM extends FiniteStateMachine<string, string>, S, E> =
+export type NextState<FSM extends FiniteStateMachine<string, string>, S, E> =
   S extends State<FSM> // if S is a state in FSM
     ? E extends Event<FSM> // if E is an event in FSM
       ? MatchingTransition<FSM, S, E> extends never // if no matching transition
