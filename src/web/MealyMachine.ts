@@ -6,7 +6,7 @@ import {
 
 export interface Transition<State extends string, Event extends string, Context>
   extends FSMTransition<State, Event> {
-  readonly reducer?: (event: Context) => Context;
+  readonly reducer?: (context: Readonly<Context>) => Context;
 }
 
 export interface MealyMachine<
