@@ -1,48 +1,44 @@
-export interface Transition<State extends string, Event extends string> {
+import { IsLiteral, ReadonlyDeep } from "type-fest";
+
+export interface Transition<State, Event> {
   readonly from: State;
   readonly to: State;
   readonly event: Event;
 }
 
-export interface FiniteStateMachine<
-  State extends string,
-  Event extends string,
-> {
+export interface FiniteStateMachine<State, Event> {
   readonly initialState: State;
   readonly transitions: ReadonlyArray<Transition<State, Event>>;
 }
 
-type State<FSM> = FSM extends FiniteStateMachine<infer S, string> ? S : never;
+type State<FSM> = FSM extends FiniteStateMachine<infer S, unknown> ? S : never;
 
-type Event<FSM> = FSM extends FiniteStateMachine<string, infer E> ? E : never;
+type Event<FSM> = FSM extends FiniteStateMachine<unknown, infer E> ? E : never;
 
-type ReachableState<FSM extends FiniteStateMachine<string, string>> =
+type ReachableState<FSM extends FiniteStateMachine<unknown, unknown>> =
   FSM["transitions"][number]["to"];
 
 type ReachableStateFrom<
-  FSM extends FiniteStateMachine<string, string>,
+  FSM extends FiniteStateMachine<unknown, unknown>,
   S extends State<FSM>,
 > = Extract<FSM["transitions"][number], { from: S }>["to"];
 
 type MatchingTransition<
-  FSM extends FiniteStateMachine<string, string>,
+  FSM extends FiniteStateMachine<unknown, unknown>,
   S extends State<FSM>,
   E extends Event<FSM>,
 > = Extract<FSM["transitions"][number], { from: S; event: E }>;
 
-// Check if a type is a literal string type
-type IsStringLiteral<T> = string extends T ? false : true;
-
-export type NextState<FSM extends FiniteStateMachine<string, string>, S, E> =
+export type NextState<FSM extends FiniteStateMachine<unknown, unknown>, S, E> =
   S extends State<FSM> // if S is a state in FSM
     ? E extends Event<FSM> // if E is an event in FSM
       ? MatchingTransition<FSM, S, E> extends never // if no matching transition
         ? undefined
         : MatchingTransition<FSM, S, E>["to"]
-      : IsStringLiteral<E> extends true // if E is a string literal
+      : IsLiteral<E> extends true // if E is a string literal
         ? undefined
         : ReachableStateFrom<FSM, S> | undefined
-    : IsStringLiteral<S> extends true // if S is a string literal
+    : IsLiteral<S> extends true // if S is a string literal
       ? undefined
       : ReachableState<FSM> | undefined;
 /**
@@ -58,7 +54,7 @@ export type NextState<FSM extends FiniteStateMachine<string, string>, S, E> =
  * @returns The next state of the FSM after the transition, or `undefined` if no valid transition is found.
  */
 export function transition<
-  FSM extends FiniteStateMachine<string, string>,
+  FSM extends FiniteStateMachine<unknown, unknown>,
   State extends string,
   Event extends string,
 >(fsm: FSM, state: State, event: Event): NextState<FSM, State, Event> {

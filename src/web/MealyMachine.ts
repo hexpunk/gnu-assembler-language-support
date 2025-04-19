@@ -4,21 +4,18 @@ import {
   NextState,
 } from "./FiniteStateMachine";
 
-export interface Transition<State extends string, Event extends string, Context>
+export interface Transition<State, Event, Context>
   extends FSMTransition<State, Event> {
   readonly reducer?: (context: Readonly<Context>) => Context;
 }
 
-export interface MealyMachine<
-  State extends string,
-  Event extends string,
-  Context,
-> extends FiniteStateMachine<State, Event> {
+export interface MealyMachine<State, Event, Context>
+  extends FiniteStateMachine<State, Event> {
   readonly transitions: ReadonlyArray<Transition<State, Event, Context>>;
 }
 
 export type NextStateWithContext<
-  MM extends MealyMachine<string, string, Context>,
+  MM extends MealyMachine<unknown, unknown, Context>,
   State,
   Event,
   Context,
@@ -46,7 +43,7 @@ export type NextStateWithContext<
  *          otherwise `undefined`.
  */
 export function transition<
-  MM extends MealyMachine<string, string, Context>,
+  MM extends MealyMachine<unknown, unknown, Context>,
   State extends string,
   Event extends string,
   Context,
