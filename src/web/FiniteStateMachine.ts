@@ -1,4 +1,4 @@
-import { IsLiteral, ReadonlyDeep } from "type-fest";
+import { IsLiteral } from "type-fest";
 
 export interface Transition<State, Event> {
   readonly from: State;
