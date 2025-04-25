@@ -78,6 +78,39 @@ describe("MultiAttributeStore", () => {
     });
   });
 
+  describe("#add (reindexing mutable objects)", () => {
+    it("should reindex a mutable object when it is added again", () => {
+      const item = { id: 1, name: "Alice" };
+      store.add(item);
+
+      item.name = "Bob";
+
+      assert.deepEqual(
+        store.getBy("name", "Alice"),
+        [item],
+        "Index should still reflect the old value",
+      );
+      assert.deepEqual(
+        store.getBy("name", "Bob"),
+        [],
+        "Index should not reflect the new value",
+      );
+
+      store.add(item);
+
+      assert.deepEqual(
+        store.getBy("name", "Alice"),
+        [],
+        "Index should not reflect the old value",
+      );
+      assert.deepEqual(
+        store.getBy("name", "Bob"),
+        [item],
+        "Index should reflect the new value",
+      );
+    });
+  });
+
   describe("#remove", () => {
     it("should remove an item and update the indexes", () => {
       const item = { id: 1, name: "Alice" };

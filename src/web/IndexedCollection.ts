@@ -19,7 +19,7 @@
  * ```
  */
 export function defineIndexedCollection<T extends Record<string, unknown>>() {
-  return function <const K extends readonly (keyof T)[]>(
+  return function <const K extends ReadonlyArray<keyof T>>(
     keys: K,
   ): IndexedCollection<T, K[number]> {
     return new IndexedCollection(keys);
@@ -41,7 +41,7 @@ export class IndexedCollection<
   private items = new Set<T>();
   private indexes = new Map<K, Map<T[K], Set<T>>>();
 
-  constructor(private indexedKeys: readonly K[]) {
+  constructor(private indexedKeys: ReadonlyArray<K>) {
     for (const key of indexedKeys) {
       this.indexes.set(key, new Map());
     }
@@ -50,10 +50,23 @@ export class IndexedCollection<
   /**
    * Adds an item to the collection and updates all indexed keys.
    *
-   * @param item - The item to be added to the collection. It is expected to have
-   * properties corresponding to the indexed keys.
+   * @param item - The item to be added to the collection. The item must have properties
+   * corresponding to the keys used to build the index.
    */
   add(item: T) {
+    // If the item is already in the collection, remove it and re-index it.
+    if (this.items.has(item)) {
+      for (const keyMap of this.indexes.values()) {
+        for (const [value, set] of keyMap.entries()) {
+          set.delete(item);
+
+          if (set.size === 0) {
+            keyMap.delete(value);
+          }
+        }
+      }
+    }
+
     this.items.add(item);
 
     for (const key of this.indexedKeys) {
