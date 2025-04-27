@@ -34,7 +34,7 @@ userCollection.getBy("id", "hello");
 defineIndexedCollection<User>()(["id", "phone"]);
 
 // Unit tests
-describe("MultiAttributeStore", () => {
+describe("IndexedCollection", () => {
   const store = defineIndexedCollection<User>()(["id", "name"]);
 
   beforeEach(() => {
