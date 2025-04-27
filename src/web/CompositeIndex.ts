@@ -71,4 +71,76 @@ class CompositeIndex<
       }
     }
   }
+
+  /**
+   * Removes an item from the composite index.
+   *
+   * @param item - The item to be removed from the composite index. The item must have properties
+   * corresponding to the keys used to build the index.
+   */
+  remove(item: T) {
+    if (this.items.has(item)) {
+      this.items.delete(item);
+
+      let current = this.index;
+      let i = 0;
+
+      while (i < this.keys.length) {
+        const key = this.keys[i];
+        const value = item[key];
+        const isLast = i === this.keys.length - 1;
+
+        if (isLast) {
+          const set = (current as Map<any, Set<T>>).get(value);
+          if (set) {
+            set.delete(item);
+            if (set.size === 0) {
+              (current as Map<any, Set<T>>).delete(value);
+            }
+          }
+          return;
+        }
+
+        const next = (current as Map<any, any>).get(value);
+        if (!next) {
+          return;
+        }
+
+        current = next;
+        i++;
+      }
+    }
+  }
+
+  /**
+   * Finds items in the composite index that match the specified key-value pairs.
+   *
+   * @param query - An object containing key-value pairs to search for in the composite index.
+   * The keys must be a subset of the keys used to build the index.
+   * @returns A set of items that match the specified key-value pairs.
+   */
+  find(query: { [P in K[number]]: T[P] }): T[] {
+    let current = this.index;
+    let i = 0;
+    while (i < this.keys.length) {
+      const key = this.keys[i];
+      const value = query[key];
+      const isLast = i === this.keys.length - 1;
+
+      if (isLast) {
+        const set = (current as Map<any, Set<T>>).get(value);
+        return set ? Array.from(set) : [];
+      }
+
+      const next = (current as Map<any, any>).get(value);
+      if (!next) {
+        return [];
+      }
+
+      current = next;
+      i++;
+    }
+
+    return [];
+  }
 }
